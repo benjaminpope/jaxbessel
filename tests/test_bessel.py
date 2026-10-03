@@ -164,4 +164,4 @@ def _check_imports(tree):
             roots = {(node.module or "").split(".")[0]}
         else:
             continue
-        assert roots <= {"functools", "jax", "numpy"}, roots
+        assert roots <= {"functools", "jax", "math", "numpy"}, roots
