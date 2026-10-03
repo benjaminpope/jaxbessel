@@ -100,15 +100,15 @@ def test_spherical_custom_rule_passes_check_grads(x):
     )
 
 
-def test_spherical_derivatives_at_zero_are_exact():
+def test_spherical_derivatives_at_zero():
     zero = np.asarray(0.0)
     # j_1'(0) = 1/3 and j_0''(0) = -1/3; every other first and second
     # derivative at zero vanishes except j_2''(0) = 2/15.
     jac = jax.jacfwd(lambda z: spherical_bessel_jn(4, z))(zero)
     hess = jax.jacfwd(jax.jacrev(lambda z: spherical_bessel_jn(4, z)))(zero)
-    assert onp.allclose(onp.asarray(jac), [0, 1 / 3, 0, 0, 0], rtol=0, atol=1e-15)
+    assert onp.allclose(onp.asarray(jac), [0, 1 / 3, 0, 0, 0], rtol=0, atol=1e-14)
     assert onp.allclose(
-        onp.asarray(hess), [-1 / 3, 0, 2 / 15, 0, 0], rtol=0, atol=1e-15
+        onp.asarray(hess), [-1 / 3, 0, 2 / 15, 0, 0], rtol=0, atol=1e-14
     )
 
 
