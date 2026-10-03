@@ -1,4 +1,4 @@
-r"""$J_\nu(x) / x^\nu$ for any real order $\nu > -1/2$, in JAX.
+r"""$J_\nu(x) / x^\nu$ for real orders $-1/2 < \nu \le 12$, in JAX.
 
 This is the kernel of the visibility of a disk whose brightness is a power of
 $\mu = \sqrt{1 - r^2}$: a term $\mu^a$ transforms to
@@ -13,7 +13,9 @@ $J_\nu(x) / x^\nu = \frac{1}{2^\nu \sqrt{\pi}\,\Gamma(\nu + 1/2)}
 quadrature. It is regular at $x = 0$, where it equals
 $1 / (2^\nu \Gamma(\nu + 1))$. Above that it uses Hankel's asymptotic
 expansion, which loses accuracy below $|x| \approx 14$, just as the quadrature
-loses digits to cancellation above it.
+loses digits to cancellation above it. The expansion needs $x \gg \nu^2 / 8$
+too, so a fixed switch limits the order: above $\nu \approx 12$ the error at
+the switch grows quickly (1e-6 of the envelope by $\nu = 20$).
 
 Derivatives use a custom JVP rule from the identity
 $\frac{d}{dx}[J_\nu(x)/x^\nu] = -x\,J_{\nu+1}(x)/x^{\nu+1}$, so the $k$-th
@@ -31,6 +33,7 @@ from jax import jit
 
 __all__ = ["bessel_jv_over_xv"]
 
+MAX_ORDER = 12.0
 X_SWITCH = 14.0
 NODES = 64  # quadrature nodes; 32 per side of t = 0
 TERMS = 14  # pairs of terms in the asymptotic expansion
@@ -95,23 +98,26 @@ def _bessel_jv_over_xv_jvp(nu, primals, tangents):
 
 @partial(jit, static_argnums=0)
 def bessel_jv_over_xv(nu, x):
-    r"""Compute $J_\nu(x) / x^\nu$ for a real order $\nu > -1/2$.
+    r"""Compute $J_\nu(x) / x^\nu$ for a real order $-1/2 < \nu \le 12$.
 
     ``nu`` is a static Python float; ``x`` is any float array, and the result
     has its shape. The function is even in $x$ and regular at $x = 0$, where
     it equals $1 / (2^\nu \Gamma(\nu + 1))$, with finite gradients there.
 
     Gauss-Gegenbauer quadrature of Poisson's integral is used for
-    $|x| < 14$ and Hankel's asymptotic expansion above. For
-    $0 \le \nu \le 11$ the result agrees with
-    ``scipy.special.jv(nu, x) / x**nu`` to about 1e-12 of its envelope,
+    $|x| < 14$ and Hankel's asymptotic expansion above. The result agrees
+    with ``scipy.special.jv(nu, x) / x**nu`` to about 1e-11 of its envelope,
     $\min(1 / (2^\nu \Gamma(\nu + 1)), \sqrt{2 / (\pi x)}\,x^{-\nu})$, in
-    float64, with the largest errors next to the switch.
+    float64 (1e-12 for $\nu \le 11$), with the largest errors next to the
+    switch. Higher orders are refused because the fixed switch is too low for
+    the asymptotic expansion there.
 
     Derivatives of all orders use
     $\frac{d}{dx}[J_\nu(x)/x^\nu] = -x\,J_{\nu+1}(x)/x^{\nu+1}$ rather than
     differentiating through the approximations.
     """
-    if not nu > -0.5:
-        raise ValueError(f"bessel_jv_over_xv needs nu > -1/2, got {nu}.")
+    if not -0.5 < nu <= MAX_ORDER:
+        raise ValueError(
+            f"bessel_jv_over_xv needs -1/2 < nu <= {MAX_ORDER:g}, got {nu}."
+        )
     return _bessel_jv_over_xv(float(nu), np.asarray(x, dtype=float))

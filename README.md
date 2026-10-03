@@ -1,7 +1,7 @@
 # jaxbessel
 
 Differentiable Bessel functions of the first kind in JAX: cylindrical $J_n(x)$,
-spherical $j_n(x)$, and $J_\nu(x)/x^\nu$ for any real order $\nu > -1/2$. It
+spherical $j_n(x)$, and $J_\nu(x)/x^\nu$ for real orders $-1/2 < \nu \le 12$. It
 depends only on `jax` and `numpy`.
 
 ```bash
@@ -31,8 +31,9 @@ bessel_jv_over_xv(1.25, x)    # J_{5/4}(x) / x^{5/4}, regular at x = 0
   eq. 3), needed for orders such as $5/4$ in the square-root limb-darkening
   law. It uses Gauss-Gegenbauer quadrature of Poisson's integral for
   $|x| < 14$ and Hankel's asymptotic expansion above, and agrees with
-  `scipy.special.jv(nu, x) / x**nu` to about 1e-12 of its envelope in float64
-  for $0 \le \nu \le 11$. Its derivative is
+  `scipy.special.jv(nu, x) / x**nu` to about 1e-11 of its envelope in float64
+  for $-1/2 < \nu \le 12$; higher orders are refused, as the fixed switch is
+  too low for the asymptotic expansion there. Its derivative is
   $-x\,J_{\nu+1}(x)/x^{\nu+1}$.
 - Derivatives use custom JVP rules from the recurrence identities
   ($J_m' = (J_{m-1} - J_{m+1})/2$,

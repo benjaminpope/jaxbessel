@@ -26,7 +26,7 @@ def _float64_by_default():
 # x = 200.
 PRECISIONS = [
     pytest.param(False, "float32", 5e-5, id="float32"),
-    pytest.param(True, "float64", 2e-12, id="float64"),
+    pytest.param(True, "float64", 2e-11, id="float64"),
 ]
 
 # Include x = 0, negative x and both sides of the switch at |x| = 14.
@@ -38,7 +38,7 @@ XS = onp.unique(
         ]
     )
 )
-ORDERS = [0.0, 0.5, 1.0, 1.25, 1.5, 2.0, 2.75, 3.5, 6.0, 11.0]
+ORDERS = [-0.45, -0.25, 0.0, 0.5, 1.0, 1.25, 1.5, 2.0, 2.75, 3.5, 6.0, 11.0, 12.0]
 
 
 def _reference(nu, xs):
@@ -94,7 +94,7 @@ def test_matches_integer_and_spherical_orders():
 
 
 @pytest.mark.parametrize("x64, dtype, rtol", PRECISIONS)
-@pytest.mark.parametrize("nu", [0.0, 1.25, 2.0, 3.5])
+@pytest.mark.parametrize("nu", [-0.25, 0.0, 1.25, 2.0, 3.5, 12.0])
 def test_gradients_match_identity(nu, x64, dtype, rtol):
     # d/dx [J_nu(x) / x^nu] = -x J_{nu+1}(x) / x^{nu+1}
     with enable_x64(x64):
@@ -130,6 +130,7 @@ def test_broadcasts_and_accepts_scalars():
     assert jax.grad(lambda z: bessel_jv_over_xv(1.25, z).sum())(x).shape == x.shape
 
 
-def test_rejects_orders_at_or_below_minus_half():
+@pytest.mark.parametrize("nu", [-0.5, -1.0, 12.5, 172.0])
+def test_rejects_orders_outside_the_supported_range(nu):
     with pytest.raises(ValueError):
-        bessel_jv_over_xv(-0.5, 1.0)
+        bessel_jv_over_xv(nu, 1.0)
