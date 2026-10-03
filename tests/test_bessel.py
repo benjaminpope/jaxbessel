@@ -150,11 +150,17 @@ def test_bessel_derivatives_at_zero_are_exact():
 
 def test_depends_only_on_jax_and_numpy():
     # Projects that share this package should not inherit anything else.
-    tree = ast.parse((Path(jaxbessel.__file__).parent / "bessel.py").read_text())
+    for path in Path(jaxbessel.__file__).parent.glob("*.py"):
+        _check_imports(ast.parse(path.read_text()))
+
+
+def _check_imports(tree):
     for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             roots = {alias.name.split(".")[0] for alias in node.names}
         elif isinstance(node, ast.ImportFrom):
+            if node.level:
+                continue
             roots = {(node.module or "").split(".")[0]}
         else:
             continue

@@ -14,7 +14,7 @@ jobs:
       matrix:
         include:
           # Oldest supported JAX, and the newest, with and without x64.
-          - {python-version: "3.10", jax: "0.4.30", x64: "0"}
+          - {python-version: "3.9", jax: "0.4.30", x64: "0"}
           - {python-version: "3.12", jax: "latest", x64: "0"}
           - {python-version: "3.12", jax: "latest", x64: "1"}
     env:

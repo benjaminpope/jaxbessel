@@ -1,20 +1,20 @@
 [project]
 name = "jaxbessel"
 version = "0.1.0"
-description = "Differentiable Bessel functions of the first kind in JAX."
+description = "Differentiable Bessel and spherical Bessel functions of the first kind in JAX."
 readme = "README.md"
-requires-python = ">=3.10"
-license = {file = "LICENSE"}
+requires-python = ">=3.9"
+license = "BSD-3-Clause"
+license-files = ["LICENSE"]
 authors = [
   {name = "Benjamin Pope", email = "benjamin.pope@mq.edu.au"},
   {name = "Shashank Dholakia", email = "s.dholakia@uq.edu.au"},
 ]
-keywords = ["jax", "bessel", "special functions", "autodiff", "differentiable"]
+keywords = ["jax", "bessel", "spherical bessel", "special functions", "autodiff", "differentiable"]
 urls = {repository = "https://github.com/benjaminpope/jaxbessel"}
 dependencies = ["jax>=0.4.30", "numpy"]
 classifiers = [
     "Programming Language :: Python :: 3",
-    "License :: OSI Approved :: MIT License",
     "Operating System :: OS Independent",
 ]
 
@@ -22,7 +22,7 @@ classifiers = [
 dev = ["pytest", "scipy"]
 
 [build-system]
-requires = ["setuptools", "wheel"]
+requires = ["setuptools>=77"]
 build-backend = "setuptools.build_meta"
 
 [tool.pytest.ini_options]
