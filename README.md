@@ -31,7 +31,7 @@ spherical_bessel_jn(4, x)  # j_0(x) ... j_4(x), likewise
   including at $x = 0$.
 - Works with and without `jax_enable_x64`: outputs follow the argument's dtype.
 
-Used by [drpangloss](https://github.com/benjaminpope/drpangloss) and
+Used by [virgil](https://github.com/benjaminpope/virgil) and
 [harmonix](https://github.com/shashankdholakia/harmonix). The JAX translation
 of CEPHES `j0`/`j1`, and the original spherical Bessel functions this package
 replaces, come from Shashank Dholakia's harmonix.

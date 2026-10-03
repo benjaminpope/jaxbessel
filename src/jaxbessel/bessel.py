@@ -1,6 +1,6 @@
 """Bessel functions of the first kind, J_n(x), in JAX.
 
-Depends only on JAX and NumPy, so that drpangloss, harmonix and other projects
+Depends only on JAX and NumPy, so that virgil, harmonix and other projects
 can share it.
 
 ``j0`` and ``j1`` follow the [CEPHES](https://www.netlib.org/cephes/)
