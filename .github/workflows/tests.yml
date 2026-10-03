@@ -1,0 +1,36 @@
+name: tests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  test:
+    name: py${{ matrix.python-version }} jax ${{ matrix.jax }}${{ matrix.x64 == '1' && ' x64' || '' }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Oldest supported JAX, and the newest, with and without x64.
+          - {python-version: "3.10", jax: "0.4.30", x64: "0"}
+          - {python-version: "3.12", jax: "latest", x64: "0"}
+          - {python-version: "3.12", jax: "latest", x64: "1"}
+    env:
+      JAX_ENABLE_X64: ${{ matrix.x64 }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - name: create environment
+        run: |
+          uv venv --python ${{ matrix.python-version }} .venv
+          uv pip install --python .venv/bin/python -e ".[dev]"
+          if [ "${{ matrix.jax }}" = "latest" ]; then
+            uv pip install --python .venv/bin/python --upgrade jax jaxlib
+          else
+            uv pip install --python .venv/bin/python "jax==${{ matrix.jax }}" "jaxlib==${{ matrix.jax }}"
+          fi
+          .venv/bin/python -c "import jax; print('jax', jax.__version__)"
+      - name: tests
+        run: .venv/bin/python -m pytest
